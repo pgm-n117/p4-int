@@ -58,19 +58,43 @@ const bit<5>  IPV4_OPTION_INT = 31;
 // Mirroring defs
 typedef bit<3> mirror_type_t;
 typedef bit<8>  pkt_type_t;
-
+//
 const mirror_type_t MIRROR_TYPE_I2E = 1;
-const mirror_type_t MIRROR_TYPE_E2E = 2;
-const pkt_type_t PKT_TYPE_NORMAL = 1;
+//const mirror_type_t MIRROR_TYPE_E2E = 2;
+//const pkt_type_t PKT_TYPE_NORMAL = 1;
 const pkt_type_t PKT_TYPE_MIRROR = 2;
-
+//
 typedef bit<32> switch_id_t;
 typedef bit<48> timestamp_t;
 typedef bit<6>  output_port_t;
 
+
+
+//Weird stuff from ONOS code
+typedef bit<8> MeterColor;
+const MeterColor MeterColor_GREEN = 8w0;
+const MeterColor MeterColor_YELLOW = 8w1;
+const MeterColor MeterColor_RED = 8w2;
+
+
+
 /*************************************************************************
 *********************** H E A D E R S  ***********************************
 *************************************************************************/
+
+@controller_header("packet_in")
+header packet_in_header_t {
+    bit<9> ingress_port;
+    bit<7> _padding;
+}
+
+@controller_header("packet_out")
+header packet_out_header_t {
+    bit<9> egress_port;
+    bit<7> _padding;
+}
+
+
 
 header ethernet_t {
     bit<48> dst_addr;
@@ -251,14 +275,18 @@ header local_report_header_t {
 
 const bit<8> LOCAL_REPORT_HEADER_LEN = 16;
 
-header mirror_h {
-    pkt_type_t  pkt_type;
-    bit<16> ingress_port_id;
-    bit<8>  queue_id;
-    bit<64> ingress_global_tstamp;
-}
+//header mirror_h {
+//    pkt_type_t  pkt_type;
+//    bit<16> ingress_port_id;
+//    bit<8>  queue_id;
+//    bit<64> ingress_global_tstamp;
+//}
 
 struct headers {
+    //Controller packet-in packet-out headers
+    packet_out_header_t packet_out;
+    packet_in_header_t packet_in;
+
 
     // Original Packet Headers
     ethernet_t                  ethernet;
@@ -289,7 +317,7 @@ struct headers {
     report_individual_header_t  report_individual_header;
     local_report_header_t       local_report_header;
 
-    mirror_h                       mirror_header;
+    //mirror_h                       mirror_header;
 }
 
 struct int_metadata_t {
@@ -306,9 +334,10 @@ struct int_metadata_t {
 struct local_metadata_t {
     bit<16>       l4_src_port;
     bit<16>       l4_dst_port;
+    next_hop_id_t next_hop_id;
     int_metadata_t int_meta;
     bool  mirror;
     pkt_type_t pkt_type;
-    MirrorId_t ing_mir_ses;   // Ingress mirror session ID
-    MirrorId_t egr_mir_ses;   // Egress mirror session ID
+    //MirrorId_t ing_mir_ses;   // Ingress mirror session ID
+    //MirrorId_t egr_mir_ses;   // Egress mirror session ID
 }
